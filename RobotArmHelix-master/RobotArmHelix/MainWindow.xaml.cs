@@ -638,6 +638,7 @@ namespace RobotArmHelix
                 double gradient = PartialGradient(target, angles, i);
                 angles[i] -= LearningRate * gradient;
 
+
                 // Clamp
                 angles[i] = Clamp(angles[i], joints[i].angleMin, joints[i].angleMax);
 
