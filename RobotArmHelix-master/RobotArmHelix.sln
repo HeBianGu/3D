@@ -5,6 +5,8 @@ VisualStudioVersion = 17.10.35013.160
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RobotArmHelix", "RobotArmHelix\RobotArmHelix.csproj", "{E14738AE-AF61-4F59-841E-0A81B4D85893}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RobotArmHelix1", "RobotArmHelix1\RobotArmHelix1.csproj", "{F070B2C8-8540-47EA-9206-C01A74B332AA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,6 +20,12 @@ Global
 		{E14738AE-AF61-4F59-841E-0A81B4D85893}.IRB6700|Any CPU.Build.0 = IRB6700|Any CPU
 		{E14738AE-AF61-4F59-841E-0A81B4D85893}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E14738AE-AF61-4F59-841E-0A81B4D85893}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F070B2C8-8540-47EA-9206-C01A74B332AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F070B2C8-8540-47EA-9206-C01A74B332AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F070B2C8-8540-47EA-9206-C01A74B332AA}.IRB6700|Any CPU.ActiveCfg = IRB6700|Any CPU
+		{F070B2C8-8540-47EA-9206-C01A74B332AA}.IRB6700|Any CPU.Build.0 = IRB6700|Any CPU
+		{F070B2C8-8540-47EA-9206-C01A74B332AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F070B2C8-8540-47EA-9206-C01A74B332AA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
