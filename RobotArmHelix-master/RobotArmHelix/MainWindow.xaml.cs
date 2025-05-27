@@ -17,6 +17,299 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using HelixToolkit.Wpf;
 using System.IO;
+using RobotArmHelix;
+
+
+public class IRB4600
+{
+    private const string MODEL_PATH1 = "IRB6700-MH3_245-300_IRC5_rev02_LINK01_CAD.stl";
+    private const string MODEL_PATH2 = "IRB6700-MH3_245-300_IRC5_rev00_LINK02_CAD.stl";
+    private const string MODEL_PATH3 = "IRB6700-MH3_245-300_IRC5_rev02_LINK03_CAD.stl";
+    private const string MODEL_PATH4 = "IRB6700-MH3_245-300_IRC5_rev01_LINK04_CAD.stl";
+    private const string MODEL_PATH5 = "IRB6700-MH3_245-300_IRC5_rev01_LINK05_CAD.stl";
+    private const string MODEL_PATH6 = "IRB6700-MH3_245-300_IRC5_rev01_LINK06_CAD.stl";
+    private const string MODEL_PATH7 = "IRB6700-MH3_245-300_IRC5_rev02_LINK01_CABLE.stl";
+    private const string MODEL_PATH8 = "IRB6700-MH3_245-300_IRC5_rev02_LINK01m_CABLE.stl";
+    private const string MODEL_PATH9 = "IRB6700-MH3_245-300_IRC5_rev00_LINK02_CABLE.stl";
+    private const string MODEL_PATH10 = "IRB6700-MH3_245-300_IRC5_rev00_LINK02m_CABLE.stl";
+    private const string MODEL_PATH11 = "IRB6700-MH3_245-300_IRC5_rev00_LINK03a_CABLE.stl";
+    private const string MODEL_PATH12 = "IRB6700-MH3_245-300_IRC5_rev00_LINK03b_CABLE.stl";
+    private const string MODEL_PATH13 = "IRB6700-MH3_245-300_IRC5_rev02_LINK03m_CABLE.stl";
+    private const string MODEL_PATH14 = "IRB6700-MH3_245-300_IRC5_rev01_LINK04_CABLE.stl";
+    private const string MODEL_PATH15 = "IRB6700-MH3_245-300_IRC5_rev00_ROD_CAD.stl";
+    private const string MODEL_PATH16 = "IRB6700-MH3_245-300_IRC5_rev00_LOGO1_CAD.stl";
+    private const string MODEL_PATH17 = "IRB6700-MH3_245-300_IRC5_rev00_LOGO2_CAD.stl";
+    private const string MODEL_PATH18 = "IRB6700-MH3_245-300_IRC5_rev00_LOGO3_CAD.stl";
+    private const string MODEL_PATH19 = "IRB6700-MH3_245-300_IRC5_rev01_BASE_CAD.stl";
+    private const string MODEL_PATH20 = "IRB6700-MH3_245-300_IRC5_rev00_CYLINDER_CAD.stl";
+
+    List<Joint> joints = null;
+
+    Model3DGroup RA;
+    public IRB4600()
+    {
+        List<string> modelsNames = new List<string>();
+        modelsNames.Add(MODEL_PATH1);
+        modelsNames.Add(MODEL_PATH2);
+        modelsNames.Add(MODEL_PATH3);
+        modelsNames.Add(MODEL_PATH4);
+        modelsNames.Add(MODEL_PATH5);
+        modelsNames.Add(MODEL_PATH6);
+        modelsNames.Add(MODEL_PATH7);
+        modelsNames.Add(MODEL_PATH8);
+        modelsNames.Add(MODEL_PATH9);
+        modelsNames.Add(MODEL_PATH10);
+        modelsNames.Add(MODEL_PATH11);//Until here for the 4600
+                                      //#if IRB6700
+        modelsNames.Add(MODEL_PATH12);
+        modelsNames.Add(MODEL_PATH13);
+        modelsNames.Add(MODEL_PATH14);
+        modelsNames.Add(MODEL_PATH15);
+        modelsNames.Add(MODEL_PATH16);
+        modelsNames.Add(MODEL_PATH17);
+        modelsNames.Add(MODEL_PATH18);
+        modelsNames.Add(MODEL_PATH19);
+        modelsNames.Add(MODEL_PATH20);
+    }
+
+    private Model3DGroup Initialize_Environment(List<string> modelsNames)
+    {
+        try
+        {
+            string basePath = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\3D_Models\\";
+
+            ModelImporter import = new ModelImporter();
+            joints = new List<Joint>();
+
+            foreach (string modelName in modelsNames)
+            {
+                var materialGroup = new MaterialGroup();
+                Color mainColor = Colors.White;
+                EmissiveMaterial emissMat = new EmissiveMaterial(new SolidColorBrush(mainColor) { Opacity = 0.1 });
+                DiffuseMaterial diffMat = new DiffuseMaterial(new SolidColorBrush(mainColor) { Opacity = 0.1 });
+                SpecularMaterial specMat = new SpecularMaterial(new SolidColorBrush(mainColor) { Opacity = 0.1 }, 200);
+                materialGroup.Children.Add(emissMat);
+                materialGroup.Children.Add(diffMat);
+                materialGroup.Children.Add(specMat);
+
+                var link = import.Load(basePath + modelName);
+                GeometryModel3D model = link.Children[0] as GeometryModel3D;
+                model.Material = materialGroup;
+                model.BackMaterial = materialGroup;
+                joints.Add(new Joint(link));
+            }
+
+            RA.Children.Add(joints[0].model);
+            RA.Children.Add(joints[1].model);
+            RA.Children.Add(joints[2].model);
+            RA.Children.Add(joints[3].model);
+            RA.Children.Add(joints[4].model);
+            RA.Children.Add(joints[5].model);
+            RA.Children.Add(joints[6].model);
+            RA.Children.Add(joints[7].model);
+            RA.Children.Add(joints[8].model);
+            RA.Children.Add(joints[9].model);
+            RA.Children.Add(joints[10].model);
+            //#if IRB6700
+            RA.Children.Add(joints[11].model);
+            RA.Children.Add(joints[12].model);
+            RA.Children.Add(joints[13].model);
+            RA.Children.Add(joints[14].model);
+            RA.Children.Add(joints[15].model);
+            RA.Children.Add(joints[16].model);
+            RA.Children.Add(joints[17].model);
+            RA.Children.Add(joints[18].model);
+            RA.Children.Add(joints[19].model);
+            //#endif
+
+            //#if IRB6700
+            Color cableColor = Colors.DarkSlateGray;
+            changeModelColor(joints[6], cableColor);
+            changeModelColor(joints[7], cableColor);
+            changeModelColor(joints[8], cableColor);
+            changeModelColor(joints[9], cableColor);
+            changeModelColor(joints[10], cableColor);
+            changeModelColor(joints[11], cableColor);
+            changeModelColor(joints[12], cableColor);
+            changeModelColor(joints[13], cableColor);
+
+            changeModelColor(joints[14], Colors.Gray);
+
+            changeModelColor(joints[15], Colors.Red);
+            changeModelColor(joints[16], Colors.Red);
+            changeModelColor(joints[17], Colors.Red);
+
+            changeModelColor(joints[18], Colors.Gray);
+            changeModelColor(joints[19], Colors.Gray);
+
+            joints[0].angleMin = -180;
+            joints[0].angleMax = 180;
+            joints[0].rotAxisX = 0;
+            joints[0].rotAxisY = 0;
+            joints[0].rotAxisZ = 1;
+            joints[0].rotPointX = 0;
+            joints[0].rotPointY = 0;
+            joints[0].rotPointZ = 0;
+
+            joints[1].angleMin = -100;
+            joints[1].angleMax = 60;
+            joints[1].rotAxisX = 0;
+            joints[1].rotAxisY = 1;
+            joints[1].rotAxisZ = 0;
+            joints[1].rotPointX = 348;
+            joints[1].rotPointY = -243;
+            joints[1].rotPointZ = 775;
+
+            joints[2].angleMin = -90;
+            joints[2].angleMax = 90;
+            joints[2].rotAxisX = 0;
+            joints[2].rotAxisY = 1;
+            joints[2].rotAxisZ = 0;
+            joints[2].rotPointX = 347;
+            joints[2].rotPointY = -376;
+            joints[2].rotPointZ = 1923;
+
+            joints[3].angleMin = -180;
+            joints[3].angleMax = 180;
+            joints[3].rotAxisX = 1;
+            joints[3].rotAxisY = 0;
+            joints[3].rotAxisZ = 0;
+            joints[3].rotPointX = 60;
+            joints[3].rotPointY = 0;
+            joints[3].rotPointZ = 2125;
+
+            joints[4].angleMin = -115;
+            joints[4].angleMax = 115;
+            joints[4].rotAxisX = 0;
+            joints[4].rotAxisY = 1;
+            joints[4].rotAxisZ = 0;
+            joints[4].rotPointX = 1815;
+            joints[4].rotPointY = 0;
+            joints[4].rotPointZ = 2125;
+
+            joints[5].angleMin = -180;
+            joints[5].angleMax = 180;
+            joints[5].rotAxisX = 1;
+            joints[5].rotAxisY = 0;
+            joints[5].rotAxisZ = 0;
+            joints[5].rotPointX = 2008;
+            joints[5].rotPointY = 0;
+            joints[5].rotPointZ = 2125;
+
+            //#else
+            //changeModelColor(joints[6], Colors.Red);
+            //changeModelColor(joints[7], Colors.Black);
+            //changeModelColor(joints[8], Colors.Black);
+            //changeModelColor(joints[9], Colors.Black);
+            //changeModelColor(joints[10], Colors.Gray);
+
+            //RA.Children.Add(joints[0].model);
+            //RA.Children.Add(joints[1].model);
+            //RA.Children.Add(joints[2].model);
+            //RA.Children.Add(joints[3].model);
+            //RA.Children.Add(joints[4].model);
+            //RA.Children.Add(joints[5].model);
+            //RA.Children.Add(joints[6].model);
+            //RA.Children.Add(joints[7].model);
+            //RA.Children.Add(joints[8].model);
+            //RA.Children.Add(joints[9].model);
+            //RA.Children.Add(joints[10].model);
+
+            //joints[0].angleMin = -180;
+            //joints[0].angleMax = 180;
+            //joints[0].rotAxisX = 0;
+            //joints[0].rotAxisY = 0;
+            //joints[0].rotAxisZ = 1;
+            //joints[0].rotPointX = 0;
+            //joints[0].rotPointY = 0;
+            //joints[0].rotPointZ = 0;
+
+            //joints[1].angleMin = -100;
+            //joints[1].angleMax = 60;
+            //joints[1].rotAxisX = 0;
+            //joints[1].rotAxisY = 1;
+            //joints[1].rotAxisZ = 0;
+            //joints[1].rotPointX = 175;
+            //joints[1].rotPointY = -200;
+            //joints[1].rotPointZ = 500;
+
+            //joints[2].angleMin = -90;
+            //joints[2].angleMax = 90;
+            //joints[2].rotAxisX = 0;
+            //joints[2].rotAxisY = 1;
+            //joints[2].rotAxisZ = 0;
+            //joints[2].rotPointX = 190;
+            //joints[2].rotPointY = -700;
+            //joints[2].rotPointZ = 1595;
+
+            //joints[3].angleMin = -180;
+            //joints[3].angleMax = 180;
+            //joints[3].rotAxisX = 1;
+            //joints[3].rotAxisY = 0;
+            //joints[3].rotAxisZ = 0;
+            //joints[3].rotPointX = 400;
+            //joints[3].rotPointY = 0;
+            //joints[3].rotPointZ = 1765;
+
+            //joints[4].angleMin = -115;
+            //joints[4].angleMax = 115;
+            //joints[4].rotAxisX = 0;
+            //joints[4].rotAxisY = 1;
+            //joints[4].rotAxisZ = 0;
+            //joints[4].rotPointX = 1405;
+            //joints[4].rotPointY = 50;
+            //joints[4].rotPointZ = 1765;
+
+            //joints[5].angleMin = -180;
+            //joints[5].angleMax = 180;
+            //joints[5].rotAxisX = 1;
+            //joints[5].rotAxisY = 0;
+            //joints[5].rotAxisZ = 0;
+            //joints[5].rotPointX = 1405;
+            //joints[5].rotPointY = 0;
+            //joints[5].rotPointZ = 1765;
+            //#endif
+        }
+        catch (Exception e)
+        {
+            MessageBox.Show("Exception Error:" + e.StackTrace);
+        }
+        return RA;
+    }
+
+    private Color changeModelColor(Joint pJoint, Color newColor)
+    {
+        Model3DGroup models = ((Model3DGroup)pJoint.model);
+        return changeModelColor(models.Children[0] as GeometryModel3D, newColor);
+    }
+    Color oldColor = Colors.White;
+    private Color changeModelColor(GeometryModel3D pModel, Color newColor)
+    {
+        if (pModel == null)
+            return oldColor;
+
+        Color previousColor = Colors.Black;
+
+        MaterialGroup mg = (MaterialGroup)pModel.Material;
+        if (mg.Children.Count > 0)
+        {
+            try
+            {
+                previousColor = ((EmissiveMaterial)mg.Children[0]).Color;
+                ((EmissiveMaterial)mg.Children[0]).Color = newColor;
+                ((DiffuseMaterial)mg.Children[1]).Color = newColor;
+
+            }
+            catch (Exception exc)
+            {
+                previousColor = oldColor;
+            }
+        }
+
+        return previousColor;
+    }
+
+}
 
 
 /**
@@ -43,6 +336,7 @@ namespace RobotArmHelix
         {
             model = pModel;
         }
+
     }
 
     /// <summary>
@@ -80,7 +374,7 @@ namespace RobotArmHelix
         int movements = 10;
         System.Windows.Forms.Timer timer1;
 
-#if IRB6700
+        //#if IRB6700
         //directroy of all stl files
         private const string MODEL_PATH1 = "IRB6700-MH3_245-300_IRC5_rev02_LINK01_CAD.stl";
         private const string MODEL_PATH2 = "IRB6700-MH3_245-300_IRC5_rev00_LINK02_CAD.stl";
@@ -102,20 +396,20 @@ namespace RobotArmHelix
         private const string MODEL_PATH18 = "IRB6700-MH3_245-300_IRC5_rev00_LOGO3_CAD.stl";
         private const string MODEL_PATH19 = "IRB6700-MH3_245-300_IRC5_rev01_BASE_CAD.stl";
         private const string MODEL_PATH20 = "IRB6700-MH3_245-300_IRC5_rev00_CYLINDER_CAD.stl";
-#else
+        //#else
 
-        private const string MODEL_PATH1 = "IRB4600_20kg-250_LINK1_CAD_rev04.stl";
-        private const string MODEL_PATH2 = "IRB4600_20kg-250_LINK2_CAD_rev04.stl";
-        private const string MODEL_PATH3 = "IRB4600_20kg-250_LINK3_CAD_rev005.stl";
-        private const string MODEL_PATH4 = "IRB4600_20kg-250_LINK4_CAD_rev04.stl";
-        private const string MODEL_PATH5 = "IRB4600_20kg-250_LINK5_CAD_rev04.stl";
-        private const string MODEL_PATH6 = "IRB4600_20kg-250_LINK6_CAD_rev04.stl";
-        private const string MODEL_PATH7 = "IRB4600_20kg-250_LINK3_CAD_rev04.stl";
-        private const string MODEL_PATH8 = "IRB4600_20kg-250_CABLES_LINK1_rev03.stl";
-        private const string MODEL_PATH9 = "IRB4600_20kg-250_CABLES_LINK2_rev03.stl";
-        private const string MODEL_PATH10 = "IRB4600_20kg-250_CABLES_LINK3_rev03.stl";
-        private const string MODEL_PATH11 = "IRB4600_20kg-250_BASE_CAD_rev04.stl";
-#endif
+        //private const string MODEL_PATH1 = "IRB4600_20kg-250_LINK1_CAD_rev04.stl";
+        //private const string MODEL_PATH2 = "IRB4600_20kg-250_LINK2_CAD_rev04.stl";
+        //private const string MODEL_PATH3 = "IRB4600_20kg-250_LINK3_CAD_rev005.stl";
+        //private const string MODEL_PATH4 = "IRB4600_20kg-250_LINK4_CAD_rev04.stl";
+        //private const string MODEL_PATH5 = "IRB4600_20kg-250_LINK5_CAD_rev04.stl";
+        //private const string MODEL_PATH6 = "IRB4600_20kg-250_LINK6_CAD_rev04.stl";
+        //private const string MODEL_PATH7 = "IRB4600_20kg-250_LINK3_CAD_rev04.stl";
+        //private const string MODEL_PATH8 = "IRB4600_20kg-250_CABLES_LINK1_rev03.stl";
+        //private const string MODEL_PATH9 = "IRB4600_20kg-250_CABLES_LINK2_rev03.stl";
+        //private const string MODEL_PATH10 = "IRB4600_20kg-250_CABLES_LINK3_rev03.stl";
+        //private const string MODEL_PATH11 = "IRB4600_20kg-250_BASE_CAD_rev04.stl";
+        //#endif
 
 
         public MainWindow()
@@ -134,7 +428,7 @@ namespace RobotArmHelix
             modelsNames.Add(MODEL_PATH9);
             modelsNames.Add(MODEL_PATH10);
             modelsNames.Add(MODEL_PATH11);//Until here for the 4600
-#if IRB6700
+                                          //#if IRB6700
             modelsNames.Add(MODEL_PATH12);
             modelsNames.Add(MODEL_PATH13);
             modelsNames.Add(MODEL_PATH14);
@@ -144,7 +438,7 @@ namespace RobotArmHelix
             modelsNames.Add(MODEL_PATH18);
             modelsNames.Add(MODEL_PATH19);
             modelsNames.Add(MODEL_PATH20);
-#endif
+            //#endif
             RoboticArm.Content = Initialize_Environment(modelsNames);
 
             /** Debug sphere to check in which point the joint is rotating**/
@@ -184,9 +478,9 @@ namespace RobotArmHelix
                 {
                     var materialGroup = new MaterialGroup();
                     Color mainColor = Colors.White;
-                    EmissiveMaterial emissMat = new EmissiveMaterial(new SolidColorBrush(mainColor));
-                    DiffuseMaterial diffMat = new DiffuseMaterial(new SolidColorBrush(mainColor));
-                    SpecularMaterial specMat = new SpecularMaterial(new SolidColorBrush(mainColor), 200);
+                    EmissiveMaterial emissMat = new EmissiveMaterial(new SolidColorBrush(mainColor) { Opacity = 0.1 });
+                    DiffuseMaterial diffMat = new DiffuseMaterial(new SolidColorBrush(mainColor) { Opacity = 0.1 });
+                    SpecularMaterial specMat = new SpecularMaterial(new SolidColorBrush(mainColor) { Opacity = 0.1 }, 200);
                     materialGroup.Children.Add(emissMat);
                     materialGroup.Children.Add(diffMat);
                     materialGroup.Children.Add(specMat);
@@ -209,7 +503,7 @@ namespace RobotArmHelix
                 RA.Children.Add(joints[8].model);
                 RA.Children.Add(joints[9].model);
                 RA.Children.Add(joints[10].model);
-#if IRB6700
+                //#if IRB6700
                 RA.Children.Add(joints[11].model);
                 RA.Children.Add(joints[12].model);
                 RA.Children.Add(joints[13].model);
@@ -219,9 +513,9 @@ namespace RobotArmHelix
                 RA.Children.Add(joints[17].model);
                 RA.Children.Add(joints[18].model);
                 RA.Children.Add(joints[19].model);
-#endif
+                //#endif
 
-#if IRB6700
+                //#if IRB6700
                 Color cableColor = Colors.DarkSlateGray;
                 changeModelColor(joints[6], cableColor);
                 changeModelColor(joints[7], cableColor);
@@ -295,79 +589,79 @@ namespace RobotArmHelix
                 joints[5].rotPointY = 0;
                 joints[5].rotPointZ = 2125;
 
-#else
-                changeModelColor(joints[6], Colors.Red);
-                changeModelColor(joints[7], Colors.Black);
-                changeModelColor(joints[8], Colors.Black);
-                changeModelColor(joints[9], Colors.Black);
-                changeModelColor(joints[10], Colors.Gray);
+                //#else
+                //changeModelColor(joints[6], Colors.Red);
+                //changeModelColor(joints[7], Colors.Black);
+                //changeModelColor(joints[8], Colors.Black);
+                //changeModelColor(joints[9], Colors.Black);
+                //changeModelColor(joints[10], Colors.Gray);
 
-                RA.Children.Add(joints[0].model);
-                RA.Children.Add(joints[1].model);
-                RA.Children.Add(joints[2].model);
-                RA.Children.Add(joints[3].model);
-                RA.Children.Add(joints[4].model);
-                RA.Children.Add(joints[5].model);
-                RA.Children.Add(joints[6].model);
-                RA.Children.Add(joints[7].model);
-                RA.Children.Add(joints[8].model);
-                RA.Children.Add(joints[9].model);
-                RA.Children.Add(joints[10].model);
+                //RA.Children.Add(joints[0].model);
+                //RA.Children.Add(joints[1].model);
+                //RA.Children.Add(joints[2].model);
+                //RA.Children.Add(joints[3].model);
+                //RA.Children.Add(joints[4].model);
+                //RA.Children.Add(joints[5].model);
+                //RA.Children.Add(joints[6].model);
+                //RA.Children.Add(joints[7].model);
+                //RA.Children.Add(joints[8].model);
+                //RA.Children.Add(joints[9].model);
+                //RA.Children.Add(joints[10].model);
 
-                joints[0].angleMin = -180;
-                joints[0].angleMax = 180;
-                joints[0].rotAxisX = 0;
-                joints[0].rotAxisY = 0;
-                joints[0].rotAxisZ = 1;
-                joints[0].rotPointX = 0;
-                joints[0].rotPointY = 0;
-                joints[0].rotPointZ = 0;
+                //joints[0].angleMin = -180;
+                //joints[0].angleMax = 180;
+                //joints[0].rotAxisX = 0;
+                //joints[0].rotAxisY = 0;
+                //joints[0].rotAxisZ = 1;
+                //joints[0].rotPointX = 0;
+                //joints[0].rotPointY = 0;
+                //joints[0].rotPointZ = 0;
 
-                joints[1].angleMin = -100;
-                joints[1].angleMax = 60;
-                joints[1].rotAxisX = 0;
-                joints[1].rotAxisY = 1;
-                joints[1].rotAxisZ = 0;
-                joints[1].rotPointX = 175;
-                joints[1].rotPointY = -200;
-                joints[1].rotPointZ = 500;
+                //joints[1].angleMin = -100;
+                //joints[1].angleMax = 60;
+                //joints[1].rotAxisX = 0;
+                //joints[1].rotAxisY = 1;
+                //joints[1].rotAxisZ = 0;
+                //joints[1].rotPointX = 175;
+                //joints[1].rotPointY = -200;
+                //joints[1].rotPointZ = 500;
 
-                joints[2].angleMin = -90;
-                joints[2].angleMax = 90;
-                joints[2].rotAxisX = 0;
-                joints[2].rotAxisY = 1;
-                joints[2].rotAxisZ = 0;
-                joints[2].rotPointX = 190;
-                joints[2].rotPointY = -700;
-                joints[2].rotPointZ = 1595;
+                //joints[2].angleMin = -90;
+                //joints[2].angleMax = 90;
+                //joints[2].rotAxisX = 0;
+                //joints[2].rotAxisY = 1;
+                //joints[2].rotAxisZ = 0;
+                //joints[2].rotPointX = 190;
+                //joints[2].rotPointY = -700;
+                //joints[2].rotPointZ = 1595;
 
-                joints[3].angleMin = -180;
-                joints[3].angleMax = 180;
-                joints[3].rotAxisX = 1;
-                joints[3].rotAxisY = 0;
-                joints[3].rotAxisZ = 0;
-                joints[3].rotPointX = 400;
-                joints[3].rotPointY = 0;
-                joints[3].rotPointZ = 1765;
+                //joints[3].angleMin = -180;
+                //joints[3].angleMax = 180;
+                //joints[3].rotAxisX = 1;
+                //joints[3].rotAxisY = 0;
+                //joints[3].rotAxisZ = 0;
+                //joints[3].rotPointX = 400;
+                //joints[3].rotPointY = 0;
+                //joints[3].rotPointZ = 1765;
 
-                joints[4].angleMin = -115;
-                joints[4].angleMax = 115;
-                joints[4].rotAxisX = 0;
-                joints[4].rotAxisY = 1;
-                joints[4].rotAxisZ = 0;
-                joints[4].rotPointX = 1405;
-                joints[4].rotPointY = 50;
-                joints[4].rotPointZ = 1765;
+                //joints[4].angleMin = -115;
+                //joints[4].angleMax = 115;
+                //joints[4].rotAxisX = 0;
+                //joints[4].rotAxisY = 1;
+                //joints[4].rotAxisZ = 0;
+                //joints[4].rotPointX = 1405;
+                //joints[4].rotPointY = 50;
+                //joints[4].rotPointZ = 1765;
 
-                joints[5].angleMin = -180;
-                joints[5].angleMax = 180;
-                joints[5].rotAxisX = 1;
-                joints[5].rotAxisY = 0;
-                joints[5].rotAxisZ = 0;
-                joints[5].rotPointX = 1405;
-                joints[5].rotPointY = 0;
-                joints[5].rotPointZ = 1765;
-#endif
+                //joints[5].angleMin = -180;
+                //joints[5].angleMax = 180;
+                //joints[5].rotAxisX = 1;
+                //joints[5].rotAxisY = 0;
+                //joints[5].rotAxisZ = 0;
+                //joints[5].rotPointX = 1405;
+                //joints[5].rotPointY = 0;
+                //joints[5].rotPointZ = 1765;
+                //#endif
             }
             catch (Exception e)
             {
@@ -529,6 +823,7 @@ namespace RobotArmHelix
                     previousColor = ((EmissiveMaterial)mg.Children[0]).Color;
                     ((EmissiveMaterial)mg.Children[0]).Color = newColor;
                     ((DiffuseMaterial)mg.Children[1]).Color = newColor;
+
                 }
                 catch (Exception exc)
                 {
@@ -778,7 +1073,7 @@ namespace RobotArmHelix
             Ty_Copy.Content = geom.Bounds.Location.Y;
             Tz_Copy.Content = geom.Bounds.Location.Z;
 
-#if IRB6700
+            //#if IRB6700
             joints[6].model.Transform = F1;
             joints[7].model.Transform = F1;
             joints[19].model.Transform = F1;
@@ -794,14 +1089,14 @@ namespace RobotArmHelix
 
             joints[13].model.Transform = F4;
             joints[17].model.Transform = F4;
-#else
-            joints[7].model.Transform = F1; //Cables
+            //#else
+            //            joints[7].model.Transform = F1; //Cables
 
-            joints[8].model.Transform = F2; //Cables
+            //            joints[8].model.Transform = F2; //Cables
 
-            joints[6].model.Transform = F3; //The ABB writing
-            joints[9].model.Transform = F3; //Cables
-#endif
+            //            joints[6].model.Transform = F3; //The ABB writing
+            //            joints[9].model.Transform = F3; //Cables
+            //#endif
 
             return new Vector3D(joints[5].model.Bounds.Location.X, joints[5].model.Bounds.Location.Y, joints[5].model.Bounds.Location.Z);
         }
