@@ -500,192 +500,192 @@ public class IRB4600
         return ForwardKinematics(angles);
     }
 
-    public double[] InverseKinematics(Vector3D targetPosition, double[] initialAngles = null)
-    {
-        // 初始角度设置（可选，用于优化计算）
-        double[] angles = initialAngles ?? new double[6];
+    //public double[] InverseKinematics(Vector3D targetPosition, double[] initialAngles = null)
+    //{
+    //    // 初始角度设置（可选，用于优化计算）
+    //    double[] angles = initialAngles ?? new double[6];
 
-        // 设置最大迭代次数和容差
-        const int maxIterations = 100;
-        const double tolerance = 1.0; // 1mm误差容限
+    //    // 设置最大迭代次数和容差
+    //    const int maxIterations = 100;
+    //    const double tolerance = 1.0; // 1mm误差容限
 
-        for (int iteration = 0; iteration < maxIterations; iteration++)
-        {
-            // 1. 使用当前角度计算当前位置
-            Vector3D currentPosition = ForwardKinematics(angles);
+    //    for (int iteration = 0; iteration < maxIterations; iteration++)
+    //    {
+    //        // 1. 使用当前角度计算当前位置
+    //        Vector3D currentPosition = ForwardKinematics(angles);
 
-            // 2. 计算当前位置与目标位置的误差
-            Vector3D error = targetPosition - currentPosition;
+    //        // 2. 计算当前位置与目标位置的误差
+    //        Vector3D error = targetPosition - currentPosition;
 
-            // 如果误差在容差范围内，返回当前角度
-            if (error.Length < tolerance)
-                return angles;
+    //        // 如果误差在容差范围内，返回当前角度
+    //        if (error.Length < tolerance)
+    //            return angles;
 
-            // 3. 计算雅可比矩阵（数值方法）
-            double[,] jacobian = CalculateJacobian(angles);
+    //        // 3. 计算雅可比矩阵（数值方法）
+    //        double[,] jacobian = CalculateJacobian(angles);
 
-            // 4. 使用伪逆解线性方程组 Δθ = J⁺Δx
-            double[] deltaAngles = SolveWithPseudoInverse(jacobian, error);
+    //        // 4. 使用伪逆解线性方程组 Δθ = J⁺Δx
+    //        double[] deltaAngles = SolveWithPseudoInverse(jacobian, error);
 
-            // 5. 更新角度
-            for (int i = 0; i < 6; i++)
-            {
-                angles[i] += deltaAngles[i];
+    //        // 5. 更新角度
+    //        for (int i = 0; i < 6; i++)
+    //        {
+    //            angles[i] += deltaAngles[i];
 
-                // 限制角度范围（根据您的机器人规格调整）
-                if (i == 0) angles[i] = ClampAngle(angles[i], -180, 180);   // 基座
-                else if (i == 1) angles[i] = ClampAngle(angles[i], -90, 90); // 肩部
-                else if (i == 2) angles[i] = ClampAngle(angles[i], 0, 135); // 肘部
-                                                                            // 其他轴的限制...
-            }
-        }
+    //            // 限制角度范围（根据您的机器人规格调整）
+    //            if (i == 0) angles[i] = ClampAngle(angles[i], -180, 180);   // 基座
+    //            else if (i == 1) angles[i] = ClampAngle(angles[i], -90, 90); // 肩部
+    //            else if (i == 2) angles[i] = ClampAngle(angles[i], 0, 135); // 肘部
+    //                                                                        // 其他轴的限制...
+    //        }
+    //    }
 
-        // 如果达到最大迭代次数仍未收敛，返回当前角度
-        return angles;
-    }
+    //    // 如果达到最大迭代次数仍未收敛，返回当前角度
+    //    return angles;
+    //}
 
-    private double[,] CalculateJacobian(double[] angles)
-    {
-        const double delta = 0.001; // 微小变化量
-        double[,] jacobian = new double[3, 6];
+    //private double[,] CalculateJacobian(double[] angles)
+    //{
+    //    const double delta = 0.001; // 微小变化量
+    //    double[,] jacobian = new double[3, 6];
 
-        // 计算当前位置
-        Vector3D basePosition = ForwardKinematics(angles);
+    //    // 计算当前位置
+    //    Vector3D basePosition = ForwardKinematics(angles);
 
-        for (int i = 0; i < 6; i++)
-        {
-            // 对每个关节角度进行微小变化
-            double[] perturbedAngles = (double[])angles.Clone();
-            perturbedAngles[i] += delta;
+    //    for (int i = 0; i < 6; i++)
+    //    {
+    //        // 对每个关节角度进行微小变化
+    //        double[] perturbedAngles = (double[])angles.Clone();
+    //        perturbedAngles[i] += delta;
 
-            // 计算微小变化后的位置
-            Vector3D perturbedPosition = ForwardKinematics(perturbedAngles);
+    //        // 计算微小变化后的位置
+    //        Vector3D perturbedPosition = ForwardKinematics(perturbedAngles);
 
-            // 计算导数 (∂x/∂θ, ∂y/∂θ, ∂z/∂θ)
-            jacobian[0, i] = (perturbedPosition.X - basePosition.X) / delta;
-            jacobian[1, i] = (perturbedPosition.Y - basePosition.Y) / delta;
-            jacobian[2, i] = (perturbedPosition.Z - basePosition.Z) / delta;
-        }
+    //        // 计算导数 (∂x/∂θ, ∂y/∂θ, ∂z/∂θ)
+    //        jacobian[0, i] = (perturbedPosition.X - basePosition.X) / delta;
+    //        jacobian[1, i] = (perturbedPosition.Y - basePosition.Y) / delta;
+    //        jacobian[2, i] = (perturbedPosition.Z - basePosition.Z) / delta;
+    //    }
 
-        return jacobian;
-    }
+    //    return jacobian;
+    //}
 
-    private double[] SolveWithPseudoInverse(double[,] jacobian, Vector3D error)
-    {
-        // 将雅可比矩阵(3x6)转换为WPF的Matrix3D
-        // 注意：Matrix3D是4x4矩阵，所以我们需要适当处理
+    //private double[] SolveWithPseudoInverse(double[,] jacobian, Vector3D error)
+    //{
+    //    // 将雅可比矩阵(3x6)转换为WPF的Matrix3D
+    //    // 注意：Matrix3D是4x4矩阵，所以我们需要适当处理
 
-        // 创建 J * Jᵀ 的3x3矩阵
-        Matrix3D JJt = new Matrix3D();
+    //    // 创建 J * Jᵀ 的3x3矩阵
+    //    Matrix3D JJt = new Matrix3D();
 
-        // 计算 J * Jᵀ
-        for (int i = 0; i < 3; i++)
-        {
-            for (int j = 0; j < 3; j++)
-            {
-                double sum = 0;
-                for (int k = 0; k < 6; k++)
-                {
-                    sum += jacobian[i, k] * jacobian[j, k];
-                }
+    //    // 计算 J * Jᵀ
+    //    for (int i = 0; i < 3; i++)
+    //    {
+    //        for (int j = 0; j < 3; j++)
+    //        {
+    //            double sum = 0;
+    //            for (int k = 0; k < 6; k++)
+    //            {
+    //                sum += jacobian[i, k] * jacobian[j, k];
+    //            }
 
-                // 设置Matrix3D元素 (注意Matrix3D是按行优先存储)
-                JJt[0, i * 4 + j] = sum; // 只填充左上3x3部分
-            }
-        }
+    //            // 设置Matrix3D元素 (注意Matrix3D是按行优先存储)
+    //            JJt[0, i * 4 + j] = sum; // 只填充左上3x3部分
+    //        }
+    //    }
 
-        // 计算 (J * Jᵀ)⁻¹
-        if (!JJt.Invert())
-        {
-            // 矩阵不可逆，处于奇异位置
-            return new double[6]; // 返回零向量或处理奇异情况
-        }
+    //    // 计算 (J * Jᵀ)⁻¹
+    //    if (!JJt.Invert())
+    //    {
+    //        // 矩阵不可逆，处于奇异位置
+    //        return new double[6]; // 返回零向量或处理奇异情况
+    //    }
 
-        // 计算 Jᵀ * (J * Jᵀ)⁻¹ (伪逆)
-        double[,] pseudoInverse = new double[6, 3];
-        for (int i = 0; i < 6; i++)
-        {
-            for (int j = 0; j < 3; j++)
-            {
-                double sum = 0;
-                for (int k = 0; k < 3; k++)
-                {
-                    sum += jacobian[k, i] * JJt[0, j * 4 + k]; // 访问逆矩阵元素
-                }
-                pseudoInverse[i, j] = sum;
-            }
-        }
+    //    // 计算 Jᵀ * (J * Jᵀ)⁻¹ (伪逆)
+    //    double[,] pseudoInverse = new double[6, 3];
+    //    for (int i = 0; i < 6; i++)
+    //    {
+    //        for (int j = 0; j < 3; j++)
+    //        {
+    //            double sum = 0;
+    //            for (int k = 0; k < 3; k++)
+    //            {
+    //                sum += jacobian[k, i] * JJt[0, j * 4 + k]; // 访问逆矩阵元素
+    //            }
+    //            pseudoInverse[i, j] = sum;
+    //        }
+    //    }
 
-        // 计算 Δθ = J⁺Δx
-        double[] deltaAngles = new double[6];
-        for (int i = 0; i < 6; i++)
-        {
-            deltaAngles[i] = pseudoInverse[i, 0] * error.X +
-                             pseudoInverse[i, 1] * error.Y +
-                             pseudoInverse[i, 2] * error.Z;
-        }
+    //    // 计算 Δθ = J⁺Δx
+    //    double[] deltaAngles = new double[6];
+    //    for (int i = 0; i < 6; i++)
+    //    {
+    //        deltaAngles[i] = pseudoInverse[i, 0] * error.X +
+    //                         pseudoInverse[i, 1] * error.Y +
+    //                         pseudoInverse[i, 2] * error.Z;
+    //    }
 
-        return deltaAngles;
-    }
+    //    return deltaAngles;
+    //}
 
-    private double[] SolveWithPseudoInverse(double[,] jacobian, Vector3D error)
-    {
-        // 创建 J * Jᵀ 的3x3矩阵
-        Matrix JJt = new Matrix();
+    //private double[] SolveWithPseudoInverse(double[,] jacobian, Vector3D error)
+    //{
+    //    // 创建 J * Jᵀ 的3x3矩阵
+    //    Matrix JJt = new Matrix();
 
-        // 填充 JJt 矩阵
-        for (int i = 0; i < 3; i++)
-        {
-            for (int j = 0; j < 3; j++)
-            {
-                double sum = 0;
-                for (int k = 0; k < 6; k++)
-                {
-                    sum += jacobian[i, k] * jacobian[j, k];
-                }
+    //    // 填充 JJt 矩阵
+    //    for (int i = 0; i < 3; i++)
+    //    {
+    //        for (int j = 0; j < 3; j++)
+    //        {
+    //            double sum = 0;
+    //            for (int k = 0; k < 6; k++)
+    //            {
+    //                sum += jacobian[i, k] * jacobian[j, k];
+    //            }
 
-                // 设置矩阵元素
-                if (i == 0 && j == 0) JJt.M11 = sum;
-                else if (i == 0 && j == 1) JJt.M12 = sum;
-                else if (i == 0 && j == 2) JJt.M13 = sum;
-                else if (i == 1 && j == 0) JJt.M21 = sum;
-                else if (i == 1 && j == 1) JJt.M22 = sum;
-                else if (i == 1 && j == 2) JJt.M23 = sum;
-                else if (i == 2 && j == 0) JJt.M31 = sum;
-                else if (i == 2 && j == 1) JJt.M32 = sum;
-                else if (i == 2 && j == 2) JJt.M33 = sum;
-            }
-        }
+    //            // 设置矩阵元素
+    //            if (i == 0 && j == 0) JJt.M11 = sum;
+    //            else if (i == 0 && j == 1) JJt.M12 = sum;
+    //            else if (i == 0 && j == 2) JJt.M13 = sum;
+    //            else if (i == 1 && j == 0) JJt.M21 = sum;
+    //            else if (i == 1 && j == 1) JJt.M22 = sum;
+    //            else if (i == 1 && j == 2) JJt.M23 = sum;
+    //            else if (i == 2 && j == 0) JJt.M31 = sum;
+    //            else if (i == 2 && j == 1) JJt.M32 = sum;
+    //            else if (i == 2 && j == 2) JJt.M33 = sum;
+    //        }
+    //    }
 
-        // 计算逆矩阵
-        if (!JJt.Invert())
-        {
-            return new double[6]; // 奇异位置处理
-        }
+    //    // 计算逆矩阵
+    //    if (!JJt.Invert())
+    //    {
+    //        return new double[6]; // 奇异位置处理
+    //    }
 
-        // 计算伪逆 J⁺ = Jᵀ * (J * Jᵀ)⁻¹
-        double[,] pseudoInverse = new double[6, 3];
-        for (int i = 0; i < 6; i++)
-        {
-            for (int j = 0; j < 3; j++)
-            {
-                pseudoInverse[i, j] = jacobian[0, i] * (j == 0 ? JJt.M11 : (j == 1 ? JJt.M12 : JJt.M13)) +
-                                     jacobian[1, i] * (j == 0 ? JJt.M21 : (j == 1 ? JJt.M22 : JJt.M23)) +
-                                     jacobian[2, i] * (j == 0 ? JJt.M31 : (j == 1 ? JJt.M32 : JJt.M33));
-            }
-        }
+    //    // 计算伪逆 J⁺ = Jᵀ * (J * Jᵀ)⁻¹
+    //    double[,] pseudoInverse = new double[6, 3];
+    //    for (int i = 0; i < 6; i++)
+    //    {
+    //        for (int j = 0; j < 3; j++)
+    //        {
+    //            pseudoInverse[i, j] = jacobian[0, i] * (j == 0 ? JJt.M11 : (j == 1 ? JJt.M12 : JJt.M13)) +
+    //                                 jacobian[1, i] * (j == 0 ? JJt.M21 : (j == 1 ? JJt.M22 : JJt.M23)) +
+    //                                 jacobian[2, i] * (j == 0 ? JJt.M31 : (j == 1 ? JJt.M32 : JJt.M33));
+    //        }
+    //    }
 
-        // 计算 Δθ = J⁺Δx
-        double[] deltaAngles = new double[6];
-        for (int i = 0; i < 6; i++)
-        {
-            deltaAngles[i] = pseudoInverse[i, 0] * error.X +
-                             pseudoInverse[i, 1] * error.Y +
-                             pseudoInverse[i, 2] * error.Z;
-        }
+    //    // 计算 Δθ = J⁺Δx
+    //    double[] deltaAngles = new double[6];
+    //    for (int i = 0; i < 6; i++)
+    //    {
+    //        deltaAngles[i] = pseudoInverse[i, 0] * error.X +
+    //                         pseudoInverse[i, 1] * error.Y +
+    //                         pseudoInverse[i, 2] * error.Z;
+    //    }
 
-        return deltaAngles;
-    }
+    //    return deltaAngles;
+    //}
 
     private double ClampAngle(double angle, double min, double max)
     {
